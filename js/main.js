@@ -1,3 +1,4 @@
-import {createPhotos} from './data-generation.js';
+import { createPhotos } from './data-generation.js';
+import { drawThumbnails } from './thumbnails.js';
 
-createPhotos();
+drawThumbnails(createPhotos());
