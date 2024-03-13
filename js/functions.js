@@ -1,3 +1,6 @@
+const SECONDS_IN_MINUTE = 60;
+const MILLISECONDS_IN_SECOND = 1000;
+
 const validateStringLength = (sourceString, maxLength) => sourceString.length <= maxLength;
 
 
@@ -27,8 +30,31 @@ const extractDigitsAsNumber = (parameter) => {
   return parseInt(stringWithDigits, 10);
 };
 
+/**
+ * Проверяет, выходит ли встреча за рамки рабочего дня.
+ *
+ * @param {string} workTimeStart
+ * @param {string} workTimeEnd
+ * @param {string} meetingTimeStart
+ * @param {number} meetingDuration Продолжительность встречи в минутах
+ *
+ * @return {boolean}
+ */
+const isMeetingWithinWorktime = (workTimeStart, workTimeEnd, meetingTimeStart, meetingDuration) => {
+  const someDate = '2024.01.01';
+  const workStart = new Date(`${someDate} ${workTimeStart}`);
+  const workEnd = new Date(`${someDate} ${workTimeEnd}`);
+  const meetingStart = new Date(`${someDate} ${meetingTimeStart}`);
+
+  const minutesTillWorkTimeEnd = (workEnd - meetingStart) / (MILLISECONDS_IN_SECOND * SECONDS_IN_MINUTE);
+
+  return meetingStart >= workStart && meetingDuration <= minutesTillWorkTimeEnd;
+};
+
 validateStringLength('строка', 6);
 
 isPalindrome('топот');
 
 extractDigitsAsNumber('ECMAScript 2022');
+
+isMeetingWithinWorktime('14:00', '17:30', '08:0', 90);
