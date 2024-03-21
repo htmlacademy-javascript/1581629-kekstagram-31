@@ -1,5 +1,5 @@
 const bigPictureComments = document.querySelector('.social__comments');
-const commentTemplate = bigPictureComments.querySelector('.social__comment');
+let commentTemplate;
 
 const createComment = ({ avatar, name, message }) => {
   const comment = commentTemplate.cloneNode(true);
@@ -12,11 +12,19 @@ const createComment = ({ avatar, name, message }) => {
   return comment;
 };
 
-const renderComments = (comments) => {
+const renderComments = (elementTemplate, comments) => {
+  commentTemplate = elementTemplate;
   const commentsFragment = document.createDocumentFragment();
   commentsFragment.append(...comments.map(createComment));
-  bigPictureComments.innerHTML = '';
   bigPictureComments.append(commentsFragment);
 };
 
-export { renderComments };
+const getCommentTemplate = () => bigPictureComments
+  .querySelector('.social__comment')
+  .cloneNode(true);
+
+const clearComments = () => {
+  bigPictureComments.innerHTML = '';
+};
+
+export { renderComments, getCommentTemplate, clearComments };
