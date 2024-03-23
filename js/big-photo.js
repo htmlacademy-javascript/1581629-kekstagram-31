@@ -67,7 +67,6 @@ const openPopup = () => {
   document.body.classList.add('modal-open');
 };
 
-
 const renderBigPhoto = (photo) => {
   const bigPictureImg = bigPicture.querySelector('.big-picture__img img');
   bigPictureImg.src = photo.url;

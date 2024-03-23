@@ -1,3 +1,6 @@
+import { renderBigPhoto } from './big-photo.js';
+
+const picturesContainer = document.querySelector('.pictures');
 const userImageTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
 const createThumbnail = ({id, url, description, likes, comments}) => {
@@ -15,9 +18,22 @@ const createThumbnail = ({id, url, description, likes, comments}) => {
 };
 
 const renderThumbnails = (photos) => {
+  picturesContainer.addEventListener('click', (evt) => {
+    const thumbnailPicture = evt.target.closest('.picture');
+
+    if (thumbnailPicture) {
+      evt.preventDefault();
+
+      const selectedPhotoId = Number(thumbnailPicture.dataset.id);
+      const selectedPhoto = photos.find((photo) => photo.id === selectedPhotoId);
+
+      renderBigPhoto(selectedPhoto);
+    }
+  });
+
   const userPhotoFragment = document.createDocumentFragment();
   userPhotoFragment.append(...photos.map(createThumbnail));
-  document.querySelector('.pictures').append(userPhotoFragment);
+  picturesContainer.append(userPhotoFragment);
 };
 
 export { renderThumbnails };
