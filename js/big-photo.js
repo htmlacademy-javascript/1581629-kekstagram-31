@@ -74,7 +74,7 @@ const renderBigPhoto = (photo) => {
   bigPicture.querySelector('.likes-count').textContent = photo.likes;
   bigPicture.querySelector('.social__caption').textContent = photo.description;
 
-  commentTemplate = getCommentTemplate();
+  commentTemplate = commentTemplate ?? getCommentTemplate();
   clearComments();
 
   allComments = photo.comments;
