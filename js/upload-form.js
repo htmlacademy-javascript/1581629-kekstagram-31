@@ -1,5 +1,7 @@
 import '/vendor/pristine/pristine.min.js';
 import { isEscapeKey } from './utils.js';
+import { onIncreaseScaleControlClick, onDecreaseScaleControlClick } from './scaling.js';
+import { initVisualEffect, onVisualEffectClick } from './visual-effects.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 
@@ -8,6 +10,10 @@ const hashtags = uploadForm.querySelector('.text__hashtags');
 const description = uploadForm.querySelector('.text__description');
 const uploadOverlay = uploadForm.querySelector('.img-upload__overlay');
 const formCancelButton = uploadForm.querySelector('.img-upload__cancel');
+const decreaseScaleControl = uploadForm.querySelector('.scale__control--smaller');
+const increaseScaleControl = uploadForm.querySelector('.scale__control--bigger');
+const visualEffects = uploadForm.querySelector('.effects__list');
+const previewImage = uploadForm.querySelector('.img-upload__preview img');
 
 const onCancelButtonClick = (evt) => {
   evt.preventDefault();
@@ -24,17 +30,6 @@ const onDocumentKeydown = (evt) => {
 const onDescriptionKeydown = (evt) => evt.stopPropagation();
 
 const onHashtagsKeydown = (evt) => evt.stopPropagation();
-
-function closeUploadPopup () {
-  document.body.classList.remove('modal-open');
-  uploadOverlay.classList.add('hidden');
-  uploadForm.reset();
-
-  formCancelButton.removeEventListener('click', onCancelButtonClick);
-  document.removeEventListener('keydown', onDocumentKeydown);
-  description.removeEventListener('keydown', onDescriptionKeydown);
-  hashtags.removeEventListener('keydown', onHashtagsKeydown);
-}
 
 const pristine = new Pristine(uploadForm, {
   classTo: 'img-upload__field-wrapper',
@@ -54,6 +49,41 @@ const validateHashtagsDuplicates = (tags) => tags.split(' ')
   .map((value) => value.toLowerCase())
   .filter((value, index, values) => values.indexOf(value) !== index)
   .length === 0;
+
+uploadForm.addEventListener('submit', (evt) => {
+  if (!pristine.validate()) {
+    evt.preventDefault();
+  }
+});
+
+const openUploadPopup = () => {
+  initVisualEffect();
+  uploadOverlay.classList.remove('hidden');
+  document.body.classList.add('modal-open');
+
+  formCancelButton.addEventListener('click', onCancelButtonClick);
+  document.addEventListener('keydown', onDocumentKeydown);
+  decreaseScaleControl.addEventListener('click', onDecreaseScaleControlClick);
+  increaseScaleControl.addEventListener('click', onIncreaseScaleControlClick);
+  visualEffects.addEventListener('click', onVisualEffectClick);
+  hashtags.addEventListener('keydown', onHashtagsKeydown);
+  description.addEventListener('keydown', onDescriptionKeydown);
+};
+
+function closeUploadPopup () {
+  document.body.classList.remove('modal-open');
+  uploadOverlay.classList.add('hidden');
+  uploadForm.reset();
+  previewImage.style.transform = 'none';
+
+  formCancelButton.removeEventListener('click', onCancelButtonClick);
+  document.removeEventListener('keydown', onDocumentKeydown);
+  decreaseScaleControl.removeEventListener('click', onDecreaseScaleControlClick);
+  increaseScaleControl.removeEventListener('click', onIncreaseScaleControlClick);
+  visualEffects.removeEventListener('click', onVisualEffectClick);
+  hashtags.removeEventListener('keydown', onHashtagsKeydown);
+  description.removeEventListener('keydown', onDescriptionKeydown);
+}
 
 pristine.addValidator(
   description,
@@ -78,22 +108,5 @@ pristine.addValidator(
   validateHashtagsDuplicates,
   'Один и тот же хэштег не может быть использован дважды'
 );
-
-uploadForm.addEventListener('submit', (evt) => {
-  const isValid = pristine.validate();
-  if (!isValid) {
-    evt.preventDefault();
-  }
-});
-
-const openUploadPopup = () => {
-  uploadOverlay.classList.remove('hidden');
-  document.body.classList.add('modal-open');
-
-  formCancelButton.addEventListener('click', onCancelButtonClick);
-  document.addEventListener('keydown', onDocumentKeydown);
-  description.addEventListener('keydown', onDescriptionKeydown);
-  hashtags.addEventListener('keydown', onHashtagsKeydown);
-};
 
 export { openUploadPopup };
