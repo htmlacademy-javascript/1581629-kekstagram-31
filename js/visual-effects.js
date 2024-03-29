@@ -4,6 +4,7 @@ const slider = uploadForm.querySelector('.effect-level__slider');
 const effectLevel = uploadForm.querySelector('.effect-level__value');
 const sliderContainer = uploadForm.querySelector('.img-upload__effect-level');
 
+const DEFAULT_EFFECT_NAME = 'none';
 let currentEffect;
 
 const effectsMap = {
@@ -82,51 +83,40 @@ const effectsMap = {
   },
 };
 
-const getDefaultEffect = () => effectsMap.none;
+const getDefaultEffectName = () => DEFAULT_EFFECT_NAME;
 const getDefaultOptions = () => effectsMap.none.options;
 
 const onSliderUpdate = () => {
   effectLevel.value = slider.noUiSlider.get();
-  currentEffect ??= getDefaultEffect();
   previewImage.style.filter = `${currentEffect.filter}(${effectLevel.value}${currentEffect.unit})`;
-};
-
-const initVisualEffect = () => {
-  currentEffect = getDefaultEffect();
-
-  effectLevel.value = currentEffect.options.start;
-  sliderContainer.classList.add('hidden');
-
-  slider.noUiSlider.updateOptions(currentEffect.options);
 };
 
 const changeVisualEffect = (effectName) => {
   currentEffect = effectsMap[effectName];
 
-  if (effectName === 'none') {
-    previewImage.style.filter = currentEffect.filter;
+  if (effectName === DEFAULT_EFFECT_NAME) {
     sliderContainer.classList.add('hidden');
+    previewImage.style.filter = currentEffect.filter;
     effectLevel.value = currentEffect.options.start;
     return;
   }
 
-  sliderContainer.classList.remove('hidden');
-
-  effectLevel.value = currentEffect.options.start;
-
   previewImage.style.filter = `${currentEffect.filter}(${effectLevel.value}${currentEffect.unit ?? ''})`;
-
+  effectLevel.value = currentEffect.options.start;
   slider.noUiSlider.updateOptions(currentEffect.options);
+  sliderContainer.classList.remove('hidden');
 };
 
 const onVisualEffectClick = (evt) => {
-  if (evt.target.tagName === 'INPUT') {
-    changeVisualEffect(evt.target.value);
+  const effectLabel = evt.target.closest('.effects__label');
+  if (effectLabel) {
+    changeVisualEffect(effectLabel.parentNode.firstElementChild.value);
   }
 };
 
 export {
-  initVisualEffect,
+  changeVisualEffect,
+  getDefaultEffectName,
   onSliderUpdate,
   onVisualEffectClick,
   getDefaultOptions
