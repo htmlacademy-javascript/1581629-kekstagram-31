@@ -8,9 +8,15 @@ import {
   onSliderUpdate,
   onVisualEffectClick
 } from './visual-effects.js';
+import { sendData } from './api.js';
+import { showMessagePopup } from './messages.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_DESCRIPTION_LENGTH = 140;
+const SubmitButtonText = {
+  IDLE: 'Опубликовать',
+  SENDING: 'Публикую...'
+};
 
 const uploadForm = document.querySelector('.img-upload__form');
 const hashtags = uploadForm.querySelector('.text__hashtags');
@@ -23,6 +29,13 @@ const visualEffects = uploadForm.querySelector('.effects__list');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
 const previewImage = uploadForm.querySelector('.img-upload__preview img');
 const slider = uploadForm.querySelector('.effect-level__slider');
+const submitButton = uploadForm.querySelector('.img-upload__submit');
+const successMessageTemplate = document.querySelector('#success')
+  .content
+  .querySelector('.success');
+const errorMessageTemplate = document.querySelector('#error')
+  .content
+  .querySelector('.error');
 
 const onCancelButtonClick = (evt) => {
   evt.preventDefault();
@@ -32,7 +45,11 @@ const onCancelButtonClick = (evt) => {
 
 const onDocumentKeydown = (evt) => {
   if(isEscapeKey(evt)) {
-    closeUploadPopup();
+    if (document.querySelector('.error')) {
+      document.querySelector('.error').remove();
+    } else {
+      closeUploadPopup();
+    }
   }
 };
 
@@ -59,11 +76,33 @@ const validateHashtagsDuplicates = (tags) => tags.split(' ')
   .filter((value, index, values) => values.indexOf(value) !== index)
   .length === 0;
 
-uploadForm.addEventListener('submit', (evt) => {
-  if (!pristine.validate()) {
-    evt.preventDefault();
+const blockSubmitButton = () => {
+  submitButton.disabled = true;
+  submitButton.textContent = SubmitButtonText.SENDING;
+};
+
+const unblockSubmitButton = () => {
+  submitButton.disabled = false;
+  submitButton.textContent = SubmitButtonText.IDLE;
+};
+
+const onUploadFormSubmit = (evt) => {
+  evt.preventDefault();
+
+  const isValid = pristine.validate();
+  if (isValid) {
+    blockSubmitButton();
+    sendData(
+      new FormData(evt.target),
+      () => {
+        closeUploadPopup();
+        showMessagePopup(successMessageTemplate, 'success');
+      },
+      () => showMessagePopup(errorMessageTemplate, 'error')
+    )
+      .finally(unblockSubmitButton);
   }
-});
+};
 
 const openUploadPopup = () => {
   changeVisualEffect(getDefaultEffectName());
@@ -81,6 +120,7 @@ const openUploadPopup = () => {
   visualEffects.addEventListener('click', onVisualEffectClick);
   hashtags.addEventListener('keydown', onHashtagsKeydown);
   description.addEventListener('keydown', onDescriptionKeydown);
+  uploadForm.addEventListener('submit', onUploadFormSubmit);
 };
 
 uploadInput.addEventListener('change', () => {
@@ -101,6 +141,7 @@ function closeUploadPopup () {
   visualEffects.removeEventListener('click', onVisualEffectClick);
   hashtags.removeEventListener('keydown', onHashtagsKeydown);
   description.removeEventListener('keydown', onDescriptionKeydown);
+  uploadForm.removeEventListener('submit', onUploadFormSubmit);
 }
 
 pristine.addValidator(
