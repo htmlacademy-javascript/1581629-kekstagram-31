@@ -2,11 +2,13 @@ import { isEscapeKey } from './utils.js';
 
 const ERROR_MESSAGE_SHOW_TIME = 5000;
 
-const showErrorText = () => {
+const showError = (message) => {
   const errorMessageTemplate = document.querySelector('#data-error')
     .content
     .querySelector('.data-error');
   const errorMessageElement = errorMessageTemplate.cloneNode(true);
+
+  errorMessageElement.querySelector('.data-error__title').textContent = message;
 
   document.body.append(errorMessageElement);
 
@@ -48,4 +50,4 @@ const showMessagePopup = (messageTemplate, messageType) => {
   }
 };
 
-export { showErrorText, showMessagePopup };
+export { showError, showMessagePopup };

@@ -1,6 +1,18 @@
 import { renderThumbnails } from './thumbnails.js';
 import './upload-form.js';
 import { getData } from './api.js';
-import { showErrorText } from './messages.js';
+import { showError } from './messages.js';
+import { setFilterClick, applyFilter } from './image-filters.js';
 
-getData(renderThumbnails, showErrorText);
+const imgFilters = document.querySelector('.img-filters');
+
+getData(
+  (photos) => {
+    renderThumbnails(photos);
+    imgFilters.classList.remove('img-filters--inactive');
+    setFilterClick(() => applyFilter(photos));
+  },
+  () => showError('Не удалось загрузить данные')
+);
+
+
