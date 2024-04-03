@@ -9,7 +9,7 @@ import {
   onVisualEffectClick
 } from './visual-effects.js';
 import { sendData } from './api.js';
-import { showError, showMessagePopup } from './messages.js';
+import { showMessagePopup } from './messages.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_DESCRIPTION_LENGTH = 140;
