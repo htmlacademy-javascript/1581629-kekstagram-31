@@ -9,10 +9,11 @@ import {
   onVisualEffectClick
 } from './visual-effects.js';
 import { sendData } from './api.js';
-import { showMessagePopup } from './messages.js';
+import { showError, showMessagePopup } from './messages.js';
 
 const MAX_HASHTAGS_COUNT = 5;
 const MAX_DESCRIPTION_LENGTH = 140;
+const FILE_TYPES = [ '.jpg', '.jpeg', '.png', '.gif' ];
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
   SENDING: 'Публикую...'
@@ -26,6 +27,7 @@ const formCancelButton = uploadForm.querySelector('.img-upload__cancel');
 const decreaseScaleControl = uploadForm.querySelector('.scale__control--smaller');
 const increaseScaleControl = uploadForm.querySelector('.scale__control--bigger');
 const visualEffects = uploadForm.querySelector('.effects__list');
+const effectsPreviews = uploadForm.querySelectorAll('.effects__preview');
 const uploadInput = uploadForm.querySelector('.img-upload__input');
 const previewImage = uploadForm.querySelector('.img-upload__preview img');
 const slider = uploadForm.querySelector('.effect-level__slider');
@@ -109,7 +111,28 @@ const onUploadFormSubmit = (evt) => {
   }
 };
 
+const openFile = (file) => {
+  const fileName = file.name.toLowerCase();
+  const isValidFileType = FILE_TYPES.some((fileType) => fileName.endsWith(fileType));
+  if (isValidFileType) {
+    const url = URL.createObjectURL(file);
+    previewImage.src = url;
+    effectsPreviews.forEach((effectPreview) => {
+      effectPreview.style.backgroundImage = `url(${url})`;
+    });
+  } else {
+    throw new Error(`Некорректный тип у файла ${fileName}`);
+  }
+};
+
 const openUploadPopup = () => {
+  try {
+    openFile(uploadInput.files[0]);
+  } catch (e) {
+    showError(e.message);
+    return;
+  }
+
   changeVisualEffect(getDefaultEffectName());
 
   noUiSlider.create(slider, getDefaultOptions());
