@@ -10,14 +10,14 @@ const Filter = {
   DISCUSSED: 'filter-discussed',
 };
 
-const imgFiltersForm = document.querySelector('.img-filters__form');
+const imageFiltersForm = document.querySelector('.img-filters__form');
 let selectedFilterName = Filter.DEFAILT;
 
-const debounceRender = debounce(renderThumbnails, RERENDER_DELAY);
-
 const setFilterClick = (cb) => {
-  imgFiltersForm.addEventListener('click', (evt) => {
-    const currentFilter = imgFiltersForm.querySelector(`.${ACTIVE_FILTER_BUTTON_CLASS}`);
+  const debounceRender = debounce(cb, RERENDER_DELAY);
+
+  imageFiltersForm.addEventListener('click', (evt) => {
+    const currentFilter = imageFiltersForm.querySelector(`.${ACTIVE_FILTER_BUTTON_CLASS}`);
     const selectedFilter = evt.target;
 
     if (selectedFilter === currentFilter) {
@@ -28,7 +28,7 @@ const setFilterClick = (cb) => {
     selectedFilter.classList.toggle(ACTIVE_FILTER_BUTTON_CLASS);
     selectedFilterName = selectedFilter.id;
 
-    cb();
+    debounceRender();
   });
 };
 
@@ -43,7 +43,7 @@ const applyFilter = (photos) => {
     filteredPhotos = filteredPhotos.sort(() => 0.5 - Math.random()).slice(0, MAX_RANDOM_PHOTOS_COUNT);
   }
 
-  debounceRender(filteredPhotos);
+  renderThumbnails(filteredPhotos);
 };
 
 export { setFilterClick, applyFilter };

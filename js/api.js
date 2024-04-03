@@ -1,7 +1,7 @@
 const BASE_URL = 'https://31.javascript.htmlacademy.pro/kekstagram';
 const Path = {
   GET_DATA: '/data',
-  SEND_DATA: '',
+  SEND_DATA: '/',
 };
 
 const getData = (onSuccess, onError) => {
@@ -14,7 +14,7 @@ const getData = (onSuccess, onError) => {
       return response.json();
     })
     .then((photos) => onSuccess(photos))
-    .catch(() => onError());
+    .catch(onError);
 };
 
 const sendData = (formData, onSuccess, onError) =>
@@ -28,6 +28,6 @@ const sendData = (formData, onSuccess, onError) =>
       }
       onSuccess();
     })
-    .catch(() => onError());
+    .catch(onError);
 
 export { getData, sendData };

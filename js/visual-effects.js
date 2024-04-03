@@ -5,7 +5,6 @@ const effectLevel = uploadForm.querySelector('.effect-level__value');
 const sliderContainer = uploadForm.querySelector('.img-upload__effect-level');
 
 const DEFAULT_EFFECT_NAME = 'none';
-let currentEffect;
 
 const effectsMap = {
   none: {
@@ -18,6 +17,15 @@ const effectsMap = {
       step: 0.1,
       start: 1,
       connect: 'lower',
+      format: {
+        to: (value) => {
+          if (Number.isInteger(value)) {
+            return value.toFixed(0);
+          }
+          return value.toFixed(1);
+        },
+        from: (value) => parseFloat(value),
+      },
     },
     unit: '',
   },
@@ -82,6 +90,8 @@ const effectsMap = {
     unit: ''
   },
 };
+
+let currentEffect;
 
 const getDefaultEffectName = () => DEFAULT_EFFECT_NAME;
 const getDefaultOptions = () => effectsMap.none.options;

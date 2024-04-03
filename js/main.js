@@ -4,15 +4,13 @@ import { getData } from './api.js';
 import { showError } from './messages.js';
 import { setFilterClick, applyFilter } from './image-filters.js';
 
-const imgFilters = document.querySelector('.img-filters');
+const imageFilters = document.querySelector('.img-filters');
 
 getData(
   (photos) => {
     renderThumbnails(photos);
-    imgFilters.classList.remove('img-filters--inactive');
+    imageFilters.classList.remove('img-filters--inactive');
     setFilterClick(() => applyFilter(photos));
   },
   () => showError('Не удалось загрузить данные')
 );
-
-

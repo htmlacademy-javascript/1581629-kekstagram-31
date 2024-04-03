@@ -1,12 +1,13 @@
 import { isEscapeKey } from './utils.js';
 import { renderComments, getCommentTemplate, clearComments } from './comments.js';
 
+const COMMENTS_PAGE_SIZE = 5;
+
 const bigPicture = document.querySelector('.big-picture');
 const bitPictureCommentsShownCount = bigPicture.querySelector('.social__comment-shown-count');
 const bigPictureCancelButton = bigPicture.querySelector('.big-picture__cancel');
 const commentsLoaderButton = bigPicture.querySelector('.comments-loader');
 
-const COMMENTS_PAGE_SIZE = 5;
 let allComments = [];
 let getNextPage;
 let commentTemplate;
@@ -69,10 +70,13 @@ const openPopup = () => {
 
 const renderBigPhoto = (photo) => {
   const bigPictureImg = bigPicture.querySelector('.big-picture__img img');
+  const bigPictureLikes = bigPicture.querySelector('.likes-count');
+  const bigPictureCaption = bigPicture.querySelector('.social__caption');
+
   bigPictureImg.src = photo.url;
   bigPictureImg.alt = photo.description;
-  bigPicture.querySelector('.likes-count').textContent = photo.likes;
-  bigPicture.querySelector('.social__caption').textContent = photo.description;
+  bigPictureLikes.textContent = photo.likes;
+  bigPictureCaption.textContent = photo.description;
 
   commentTemplate = commentTemplate ?? getCommentTemplate();
   clearComments();

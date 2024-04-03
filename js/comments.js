@@ -5,9 +5,11 @@ const createComment = ({ avatar, name, message }) => {
   const comment = commentTemplate.cloneNode(true);
 
   const commentAvatar = comment.querySelector('.social__picture');
+  const commentText = comment.querySelector('.social__text');
+
   commentAvatar.src = avatar;
   commentAvatar.alt = name;
-  comment.querySelector('.social__text').textContent = message;
+  commentText.textContent = message;
 
   return comment;
 };
