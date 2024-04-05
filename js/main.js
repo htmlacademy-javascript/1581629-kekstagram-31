@@ -1,5 +1,5 @@
 import { renderThumbnails } from './thumbnails.js';
-import './upload-form.js';
+import { setUploadInputChange, openUploadPopup } from './upload-form.js';
 import { getData } from './api.js';
 import { showError } from './messages.js';
 import { setFilterClick, applyFilter } from './image-filters.js';
@@ -14,3 +14,5 @@ getData(
   },
   () => showError('Не удалось загрузить данные')
 );
+
+setUploadInputChange(() => openUploadPopup());

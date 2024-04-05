@@ -8,11 +8,10 @@ import {
   onSliderUpdate,
   onVisualEffectClick
 } from './visual-effects.js';
+import { createFormValidator, validateForm, destroyFormValidator } from './validation.js';
 import { sendData } from './api.js';
 import { showError, showMessagePopup } from './messages.js';
 
-const MAX_HASHTAGS_COUNT = 5;
-const MAX_DESCRIPTION_LENGTH = 140;
 const FILE_TYPES = [ '.jpg', '.jpeg', '.png', '.gif' ];
 const SubmitButtonText = {
   IDLE: 'Опубликовать',
@@ -46,42 +45,22 @@ const onCancelButtonClick = (evt) => {
 };
 
 const onDocumentKeydown = (evt) => {
-  if(isEscapeKey(evt)) {
-    const errorMessagePopup = document.querySelector(`.${MessageType.ERROR}`);
+  if(!isEscapeKey(evt)) {
+    return;
+  }
 
-    if (errorMessagePopup) {
-      errorMessagePopup.remove();
-    } else {
-      closeUploadPopup();
-    }
+  const errorMessagePopup = document.querySelector(`.${MessageType.ERROR}`);
+
+  if (errorMessagePopup) {
+    errorMessagePopup.remove();
+  } else {
+    closeUploadPopup();
   }
 };
 
 const onDescriptionKeydown = (evt) => evt.stopPropagation();
 
 const onHashtagsKeydown = (evt) => evt.stopPropagation();
-
-const pristine = new Pristine(uploadForm, {
-  classTo: 'img-upload__field-wrapper',
-  errorTextParent: 'img-upload__field-wrapper',
-  errorTextClass: 'img-upload__field-wrapper--error',
-});
-
-const validateDescription = (text) => text.length <= MAX_DESCRIPTION_LENGTH;
-
-const validateHashtagsFormat = (tags) => tags.length === 0 || tags.replace(/\s+/g, ' ')
-  .split(' ')
-  .every((tag) => /^#[a-zа-яё0-9]{1,19}$/i.test(tag));
-
-const validateHashtagsCount = (tags) => tags.replace(/\s+/g, ' ')
-  .split(' ')
-  .length <= MAX_HASHTAGS_COUNT;
-
-const validateHashtagsDuplicates = (tags) => tags.replace(/\s+/g, ' ')
-  .split(' ')
-  .map((value) => value.toLowerCase())
-  .filter((value, index, values) => values.indexOf(value) !== index)
-  .length === 0;
 
 const blockSubmitButton = () => {
   submitButton.disabled = true;
@@ -96,7 +75,7 @@ const unblockSubmitButton = () => {
 const onUploadFormSubmit = (evt) => {
   evt.preventDefault();
 
-  const isValid = pristine.validate();
+  const isValid = validateForm();
   if (isValid) {
     blockSubmitButton();
     sendData(
@@ -141,6 +120,8 @@ const openUploadPopup = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
+  createFormValidator(uploadForm);
+
   formCancelButton.addEventListener('click', onCancelButtonClick);
   document.addEventListener('keydown', onDocumentKeydown);
   decreaseScaleControl.addEventListener('click', onDecreaseScaleControlClick);
@@ -151,9 +132,9 @@ const openUploadPopup = () => {
   uploadForm.addEventListener('submit', onUploadFormSubmit);
 };
 
-uploadInput.addEventListener('change', () => {
-  openUploadPopup();
-});
+const setUploadInputChange = (cb) => {
+  uploadInput.addEventListener('change', cb);
+};
 
 function closeUploadPopup () {
   document.body.classList.remove('modal-open');
@@ -161,7 +142,7 @@ function closeUploadPopup () {
   uploadForm.reset();
   previewImage.style.transform = 'none';
   slider.noUiSlider.destroy();
-  pristine.reset();
+  destroyFormValidator();
 
   formCancelButton.removeEventListener('click', onCancelButtonClick);
   document.removeEventListener('keydown', onDocumentKeydown);
@@ -173,26 +154,4 @@ function closeUploadPopup () {
   uploadForm.removeEventListener('submit', onUploadFormSubmit);
 }
 
-pristine.addValidator(
-  description,
-  validateDescription,
-  'Длина комментария должна быть не более 140 символов'
-);
-
-pristine.addValidator(
-  hashtags,
-  validateHashtagsFormat,
-  'Неверный формат хэштегов'
-);
-
-pristine.addValidator(
-  hashtags,
-  validateHashtagsCount,
-  `Нельзя указать больше ${MAX_HASHTAGS_COUNT} хэштегов`
-);
-
-pristine.addValidator(
-  hashtags,
-  validateHashtagsDuplicates,
-  'Один и тот же хэштег не может быть использован дважды'
-);
+export { setUploadInputChange, openUploadPopup };
