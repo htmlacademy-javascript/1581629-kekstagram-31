@@ -38,7 +38,7 @@ const applyFilter = (photos) => {
 
   let filteredPhotos = photos.slice();
   if (selectedFilterName === Filter.DISCUSSED) {
-    filteredPhotos.sort((a, b) => b.comments.length - a.comments.length);
+    filteredPhotos.sort((photo1, photo2) => photo2.comments.length - photo1.comments.length);
   } else if (selectedFilterName === Filter.RANDOM) {
     filteredPhotos = filteredPhotos.sort(() => 0.5 - Math.random()).slice(0, MAX_RANDOM_PHOTOS_COUNT);
   }
