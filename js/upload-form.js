@@ -1,4 +1,4 @@
-import '/vendor/pristine/pristine.min.js';
+import { MessageType } from './shared-constants.js';
 import { isEscapeKey } from './utils.js';
 import { onIncreaseScaleControlClick, onDecreaseScaleControlClick } from './scaling.js';
 import {
@@ -30,12 +30,12 @@ const uploadInput = uploadForm.querySelector('.img-upload__input');
 const previewImage = uploadForm.querySelector('.img-upload__preview img');
 const slider = uploadForm.querySelector('.effect-level__slider');
 const submitButton = uploadForm.querySelector('.img-upload__submit');
-const successMessageTemplate = document.querySelector('#success')
+const successMessageTemplate = document.querySelector(`#${MessageType.SUCCESS}`)
   .content
-  .querySelector('.success');
-const errorMessageTemplate = document.querySelector('#error')
+  .querySelector(`.${MessageType.SUCCESS}`);
+const errorMessageTemplate = document.querySelector(`#${MessageType.ERROR}`)
   .content
-  .querySelector('.error');
+  .querySelector(`.${MessageType.ERROR}`);
 
 const onCancelButtonClick = (evt) => {
   evt.preventDefault();
@@ -45,8 +45,10 @@ const onCancelButtonClick = (evt) => {
 
 const onDocumentKeydown = (evt) => {
   if(isEscapeKey(evt)) {
-    if (document.querySelector('.error')) {
-      document.querySelector('.error').remove();
+    const errorMessagePopup = document.querySelector(`.${MessageType.ERROR}`);
+
+    if (errorMessagePopup) {
+      errorMessagePopup.remove();
     } else {
       closeUploadPopup();
     }
@@ -65,13 +67,16 @@ const pristine = new Pristine(uploadForm, {
 
 const validateDescription = (text) => text.length <= MAX_DESCRIPTION_LENGTH;
 
-const validateHashtagsFormat = (tags) => tags.length === 0 || tags.split(' ')
+const validateHashtagsFormat = (tags) => tags.length === 0 || tags.replace(/\s+/g, ' ')
+  .split(' ')
   .every((tag) => /^#[a-zа-яё0-9]{1,19}$/i.test(tag));
 
-const validateHashtagsCount = (tags) => tags.split(' ')
+const validateHashtagsCount = (tags) => tags.replace(/\s+/g, ' ')
+  .split(' ')
   .length <= MAX_HASHTAGS_COUNT;
 
-const validateHashtagsDuplicates = (tags) => tags.split(' ')
+const validateHashtagsDuplicates = (tags) => tags.replace(/\s+/g, ' ')
+  .split(' ')
   .map((value) => value.toLowerCase())
   .filter((value, index, values) => values.indexOf(value) !== index)
   .length === 0;
@@ -96,9 +101,9 @@ const onUploadFormSubmit = (evt) => {
       new FormData(evt.target),
       () => {
         closeUploadPopup();
-        showMessagePopup(successMessageTemplate, 'success');
+        showMessagePopup(successMessageTemplate, MessageType.SUCCESS);
       },
-      () => showMessagePopup(errorMessageTemplate, 'error')
+      () => showMessagePopup(errorMessageTemplate, MessageType.ERROR)
     )
       .finally(unblockSubmitButton);
   }
@@ -133,6 +138,7 @@ function closeUploadPopup () {
   uploadForm.reset();
   previewImage.style.transform = 'none';
   slider.noUiSlider.destroy();
+  pristine.reset();
 
   formCancelButton.removeEventListener('click', onCancelButtonClick);
   document.removeEventListener('keydown', onDocumentKeydown);
