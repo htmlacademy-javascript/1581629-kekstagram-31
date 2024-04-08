@@ -8,7 +8,7 @@ import {
   onSliderUpdate,
   onVisualEffectClick
 } from './visual-effects.js';
-import { createFormValidator, validateForm, destroyFormValidator } from './validation.js';
+import { createFormValidator, validateForm, resetFormValidator } from './validation.js';
 import { sendData } from './api.js';
 import { showError, showMessagePopup } from './messages.js';
 
@@ -120,8 +120,6 @@ const openUploadPopup = () => {
   uploadOverlay.classList.remove('hidden');
   document.body.classList.add('modal-open');
 
-  createFormValidator(uploadForm);
-
   formCancelButton.addEventListener('click', onCancelButtonClick);
   document.addEventListener('keydown', onDocumentKeydown);
   decreaseScaleControl.addEventListener('click', onDecreaseScaleControlClick);
@@ -142,7 +140,7 @@ function closeUploadPopup () {
   uploadForm.reset();
   previewImage.style.transform = 'none';
   slider.noUiSlider.destroy();
-  destroyFormValidator();
+  resetFormValidator();
 
   formCancelButton.removeEventListener('click', onCancelButtonClick);
   document.removeEventListener('keydown', onDocumentKeydown);
@@ -153,5 +151,7 @@ function closeUploadPopup () {
   description.removeEventListener('keydown', onDescriptionKeydown);
   uploadForm.removeEventListener('submit', onUploadFormSubmit);
 }
+
+createFormValidator(uploadForm);
 
 export { setUploadInputChange, openUploadPopup };

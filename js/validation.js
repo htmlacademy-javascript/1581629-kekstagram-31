@@ -61,10 +61,10 @@ const createFormValidator = (form) => {
 
 const validateForm = () => pristine.validate();
 
-const destroyFormValidator = () => pristine.destroy();
+const resetFormValidator = () => pristine.reset();
 
 export {
   createFormValidator,
   validateForm,
-  destroyFormValidator
+  resetFormValidator
 };
