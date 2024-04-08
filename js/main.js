@@ -1,4 +1,4 @@
-import { renderThumbnails } from './thumbnails.js';
+import { renderThumbnails, setThumbnailClick, openBigPhoto } from './thumbnails.js';
 import { setUploadInputChange, openUploadPopup } from './upload-form.js';
 import { getData } from './api.js';
 import { showError } from './messages.js';
@@ -11,6 +11,7 @@ getData(
     renderThumbnails(photos);
     imageFilters.classList.remove('img-filters--inactive');
     setFilterClick(() => applyFilter(photos));
+    setThumbnailClick(() => openBigPhoto(photos));
   },
   () => showError('Не удалось загрузить данные')
 );
